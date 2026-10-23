@@ -1,10 +1,9 @@
 #include "main.h"
-#include "Cortex.h"
+#include "libcreccompsci/brain/Cortex.h"
 
 Cortex cortex = Cortex();
 
 pros::Controller controller = pros::Controller(pros::E_CONTROLLER_MASTER);
-
 
 void initialize() {}
 

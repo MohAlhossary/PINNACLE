@@ -1,6 +1,7 @@
-#pragma once
+#ifndef CORTEX_H
+#define CORTEX_H
+
 #include "Midbrain.h"
-#include "../include/pros/abstract_motor.hpp"
 
 class Cortex {
     // 1. Declare hardware peripherals first so they are initialized before dependent managers
@@ -30,3 +31,4 @@ public:
 
     }
 };
+#endif // CORTEX_H

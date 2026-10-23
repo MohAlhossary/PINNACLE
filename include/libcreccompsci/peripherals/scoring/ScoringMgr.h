@@ -1,6 +1,7 @@
-#pragma once
+#ifndef SCORINGMGR_H
+#define SCORINGMGR_H
 
-#include "../include/api.h"
+#include "api.h"
 
 class ScoringMgr {
 
@@ -31,3 +32,4 @@ public:
         return 0;
     }
 };
+#endif // SCORINGMGR_H

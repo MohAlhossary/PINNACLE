@@ -1,8 +1,9 @@
-#pragma once
+#ifndef MIDBRAIN_H
+#define MIDBRAIN_H
 
-#include "MovementMgr.h"
-#include "ScoringMgr.h"
-#include "../include/api.h"
+#include "api.h"
+#include "libcreccompsci/peripherals/movement/MovementMgr.h"
+#include "libcreccompsci/peripherals/scoring/ScoringMgr.h"
 
 class Midbrain {
 
@@ -54,3 +55,4 @@ public:
         return scoring_mgr.get_elevation();
     }
 };
+#endif // MIDBRAIN_H

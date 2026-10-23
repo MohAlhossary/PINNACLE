@@ -1,8 +1,10 @@
-#pragma once
+#ifndef DRIVETRAIN_H
+#define DRIVETRAIN_H
+
 #include <optional>
 #include <atomic>
 #include <cmath>
-#include "../include/api.h"
+#include "api.h"
 
 
 class Drivetrain {
@@ -127,3 +129,4 @@ class Drivetrain {
                 BR.move(br_power);
             }
 };
+#endif

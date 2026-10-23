@@ -1,9 +1,11 @@
-#pragma once
-#include "../include/api.h"
+#ifndef CLAW_MGR_H
+#define CLAW_MGR_H
+
+#include "api.h"
 
 class ClawMgr {
 
-    pros::MotorGroup& DR4B;
+    pros::v5::MotorGroup& DR4B;
     pros::MotorGroup& claw_rot;
     pros::MotorGroup& claw;
 
@@ -14,3 +16,4 @@ class ClawMgr {
 
 
 };
+#endif // CLAW_MGR_H
