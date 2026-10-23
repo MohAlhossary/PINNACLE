@@ -5,12 +5,9 @@
 
 
 class OdoMgr {
-
     pros::Gps &gps;
 
-    public:
-    explicit OdoMgr(pros::Gps &gps): gps(gps) {
-
-        }
+public:
+    explicit OdoMgr(pros::Gps &gps);
 };
 #endif // ODO_MGR_H
