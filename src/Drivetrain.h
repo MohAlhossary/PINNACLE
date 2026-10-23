@@ -1,7 +1,7 @@
 #pragma once
 #include <optional>
 #include <atomic>
-
+#include <cmath>
 #include "../include/api.h"
 
 
@@ -10,8 +10,8 @@ class Drivetrain {
     /**
      * Real Drivetrain Coordinates; Blue side is +x, and red side is -x, in inches
      */
-    double current_x;
-    double current_y;
+    double current_x = 0.0;
+    double current_y = 0.0;
     /**
      * Real Drivetrain Heading, in degrees
      */
@@ -20,12 +20,12 @@ class Drivetrain {
     /**
      * Target Drivetrain Coordinates; Blue side is +x, and red side is -x, in inches
      */
-    double target_x;
-    double target_y;
+    std::atomic<double> target_x{0.0};
+    std::atomic<double> target_y{0.0};
     /**
-     * Target Drivetrain Heading, in degrees
+     * Target Drivetrain Heading, in degrees (Made atomic for thread safety)
      */
-    int target_rot;
+    std::atomic<int> target_rot{0};
 
     pros::MotorGroup& FL;
     pros::MotorGroup& FR;
@@ -33,33 +33,37 @@ class Drivetrain {
     pros::MotorGroup& BR;
 
     std::optional<pros::Task> move_task;
-    std::atomic<bool> move_thread_running;
+    std::atomic<bool> move_thread_running{false};
 
     public:
         Drivetrain(pros::MotorGroup& FL, pros::MotorGroup& FR, pros::MotorGroup& BL, pros::MotorGroup& BR): FL(FL), FR(FR), BL(BL), BR(BR) {
             start_thread();
         }
 
+        ~Drivetrain() {
+            stop_thread();
+        }
+
         bool translate_to(double x, double y) {
-            target_x = x;
-            target_y = y;
+            target_x.store(x);
+            target_y.store(y);
             return true;
         }
 
         bool translate_by(double x, double y) {
-            target_x += x;
-            target_y += y;
+            target_x.store(target_x.load() + x);
+            target_y.store(target_y.load() + y);
             return true;
         }
 
         bool rotate_to(int rot) {
-            target_rot = rot;
+            target_rot.store(rot);
             return true;
         }
 
         bool rotate_by(int rot) {
-            target_rot += rot;
-            target_rot %= 360;
+            int new_rot = (target_rot.load() + rot) % 360;
+            target_rot.store(new_rot);
             return true;
         }
 
@@ -95,16 +99,22 @@ class Drivetrain {
             void start_thread() {
                 move_thread_running = true;
                 move_task.emplace([this] {
-                    move_to_target();
-                    pros::delay(20);
+                    while (move_thread_running) {
+                        move_to_target();
+                        pros::delay(20);
+                    }
                 });
             }
 
             void move_to_target() {
 
-                double delta_x = target_x - current_x;
-                double delta_y = target_y - current_y;
-                double delta_rot = target_rot - current_rot;
+                double tx = target_x.load();
+                double ty = target_y.load();
+                int trot = target_rot.load();
+
+                double delta_x = tx - current_x;
+                double delta_y = ty - current_y;
+                double delta_rot = trot - current_rot;
 
                 double fl_power = delta_x + delta_y + delta_rot;
                 double fr_power = delta_x - delta_y - delta_rot;
