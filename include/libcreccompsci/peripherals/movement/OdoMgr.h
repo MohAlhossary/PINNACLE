@@ -23,6 +23,10 @@ class OdoMgr {
     std::atomic<bool> gps_update_task_running{false};
 
     static constexpr double METERS_TO_INCHES = 39.3701;
+    /**
+     * How the GPS is mounted relative to the robot's front, in degrees, clockwise positive (-90 = turned 90° CCW)
+     */
+    static constexpr int GPS_HEADING_OFFSET = -90;
 
 public:
     explicit OdoMgr(pros::Gps &gps);
@@ -37,6 +41,8 @@ public:
     void update_pose_from_gps();
 
 private:
+    static int to_robot_heading(double gps_heading);
+
     void start_thread();
 
     void stop_thread();

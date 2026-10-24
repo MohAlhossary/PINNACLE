@@ -44,6 +44,17 @@ class DrivetrainMgr {
     std::optional<pros::Task> move_task;
     std::atomic<bool> move_task_running{false};
 
+    /**
+     * Power per inch / per degree of error; tune on the robot
+     */
+    static constexpr double KP_LINEAR = 0.05;
+    static constexpr double KP_TURN = 0.01;
+    /**
+     * Close enough to the target to stop, in inches and degrees
+     */
+    static constexpr double POSITION_TOLERANCE = 1.0;
+    static constexpr int HEADING_TOLERANCE = 2;
+
 public:
     explicit DrivetrainMgr(Drivetrain &drivetrain);
 
@@ -71,6 +82,16 @@ public:
     void set_current_pose(double x, double y, int rot);
 
 private:
+    /**
+     * Any heading -> 0..359
+     */
+    static int normalize_heading(int rot);
+
+    /**
+     * Any heading difference -> the shortest turn, -180..179
+     */
+    static int wrap_heading_error(int error);
+
     void start_thread();
 
     void stop_thread();

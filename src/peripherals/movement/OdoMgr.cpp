@@ -19,7 +19,7 @@ double OdoMgr::get_y() {
 
 
 int OdoMgr::get_rot() {
-    return static_cast<int>(gps.get_heading());
+    return to_robot_heading(gps.get_heading());
 }
 
 std::tuple<double, double, int> OdoMgr::get_pose() {
@@ -39,7 +39,13 @@ void OdoMgr::update_pose_from_gps() {
 
     gps_x.store(raw_x * METERS_TO_INCHES);
     gps_y.store(raw_y * METERS_TO_INCHES);
-    gps_rot.store(static_cast<int>(raw_heading));
+    gps_rot.store(to_robot_heading(raw_heading));
+}
+
+int OdoMgr::to_robot_heading(double gps_heading) {
+    // The GPS reports the heading of the sensor itself; undo how it is mounted, then keep it in 0..359
+    int heading = static_cast<int>(gps_heading) - GPS_HEADING_OFFSET;
+    return ((heading % 360) + 360) % 360;
 }
 
 void OdoMgr::start_thread() {

@@ -1,5 +1,8 @@
 #include "libcreccompsci/peripherals/movement/DrivetrainMgr.h"
 
+#include <cmath>
+#include <numbers>
+
 DrivetrainMgr::DrivetrainMgr(Drivetrain &drivetrain) : drivetrain(drivetrain) {
     start_thread();
 }
@@ -32,13 +35,12 @@ bool DrivetrainMgr::translate_by(double x, double y) {
 }
 
 bool DrivetrainMgr::rotate_to(int rot) {
-    target_rot.store(rot);
+    target_rot.store(normalize_heading(rot));
     return true;
 }
 
 bool DrivetrainMgr::rotate_by(int rot) {
-    int new_rot = (target_rot.load() + rot) % 360;
-    target_rot.store(new_rot);
+    target_rot.store(normalize_heading(target_rot.load() + rot));
     return true;
 }
 
@@ -76,12 +78,31 @@ void DrivetrainMgr::stop_thread() {
     move_task_running = false;
 }
 
+int DrivetrainMgr::normalize_heading(int rot) {
+    return ((rot % 360) + 360) % 360;
+}
+
+int DrivetrainMgr::wrap_heading_error(int error) {
+    return ((error % 360) + 540) % 360 - 180;
+}
+
 void DrivetrainMgr::move_to_target_async() {
-    //TODO rotate the field-frame error into the robot frame, wrap the heading error, and use a PID controller
+    //TODO replace the P gains with a PID controller
+    int rot = current_rot.load();
 
     double delta_x = target_x.load() - current_x.load();
     double delta_y = target_y.load() - current_y.load();
-    int delta_rot = target_rot.load() - current_rot.load();
+    int delta_rot = wrap_heading_error(target_rot.load() - rot);
 
-    drivetrain.set_power(delta_y, delta_x, delta_rot);
+    if (std::hypot(delta_x, delta_y) < POSITION_TOLERANCE && std::abs(delta_rot) < HEADING_TOLERANCE) {
+        drivetrain.stop();
+        return;
+    }
+
+    // Field-frame error -> robot frame. Assumes heading 0 faces field +y and increases clockwise
+    double heading = rot * std::numbers::pi / 180.0;
+    double forward = delta_x * std::sin(heading) + delta_y * std::cos(heading);
+    double strafe = delta_x * std::cos(heading) - delta_y * std::sin(heading);
+
+    drivetrain.set_power(KP_LINEAR * forward, KP_LINEAR * strafe, KP_TURN * delta_rot);
 }

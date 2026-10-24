@@ -3,7 +3,7 @@
 #include <complex>
 
 Cortex::Cortex(): midbrain(FL, FR, BL, BR, DR4B, claw_rot, claw, gps) {
-    midbrain.set_manual_mode(true);
+    midbrain.set_manual_mode(false);
 }
 
 void Cortex::tick(pros::Controller controller) {
@@ -21,6 +21,6 @@ void Cortex::tick(pros::Controller controller) {
         rot = 0;
     }
 
-    midbrain.drive_by(x,y, rot);
+    midbrain.drive_to(0, 6, 0);
     // midbrain.drive_manual(x, y, rot);
 }
