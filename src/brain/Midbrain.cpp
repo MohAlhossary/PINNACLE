@@ -5,6 +5,14 @@ Midbrain::Midbrain(pros::MotorGroup &FL, pros::MotorGroup &FR, pros::MotorGroup 
                    pros::Gps &gps) : scoring_mgr(DR4B, claw_rot, claw), movement_mgr(FL, FR, BL, BR, gps) {
 }
 
+void Midbrain::set_manual_mode(bool manual) {
+    movement_mgr.set_manual_mode(manual);
+}
+
+void Midbrain::drive_manual(double x, double y, double rot) {
+    movement_mgr.drive_manual(x, y, rot);
+}
+
 bool Midbrain::drive_to(double x, double y, int rot) {
     return movement_mgr.drive_to(x, y, rot);
 }
@@ -13,12 +21,16 @@ bool Midbrain::drive_by(double x, double y, int rot) {
     return movement_mgr.drive_by(x, y, rot);
 }
 
-bool Midbrain::turn_to(double angle) {
-    return movement_mgr.rotate_to(angle);
+bool Midbrain::drive_by(double x, double y, double rot) {
+    return movement_mgr.drive_by(x, y, rot * 360);
 }
 
-bool Midbrain::turn_by(double angle) {
-    return movement_mgr.rotate_by(angle);
+bool Midbrain::turn_to(int rot) {
+    return movement_mgr.rotate_to(rot);
+}
+
+bool Midbrain::turn_by(int rot) {
+    return movement_mgr.rotate_by(rot);
 }
 
 bool Midbrain::score() {

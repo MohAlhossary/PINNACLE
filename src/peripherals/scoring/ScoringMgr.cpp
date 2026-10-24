@@ -1,5 +1,11 @@
 #include "libcreccompsci/peripherals/scoring/ScoringMgr.h"
 
+
+ScoringMgr::ScoringMgr(pros::MotorGroup &DR4B, pros::MotorGroup &claw_rot, pros::MotorGroup &claw) : DR4B(DR4B), claw_rot(claw_rot),
+    claw(claw) {
+
+}
+
 bool ScoringMgr::score() {
     //TODO implement
     return true;

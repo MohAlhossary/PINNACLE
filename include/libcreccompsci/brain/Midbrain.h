@@ -14,13 +14,19 @@ public:
              pros::MotorGroup &DR4B, pros::MotorGroup &claw_rot, pros::MotorGroup &claw,
              pros::Gps &gps);
 
+    void set_manual_mode(bool manual);
+
+    void drive_manual(double x, double y, double rot);
+
     bool drive_to(double x, double y, int rot);
 
     bool drive_by(double x, double y, int rot);
 
-    bool turn_to(double angle);
+    bool drive_by(double x, double y, double rot);
 
-    bool turn_by(double angle);
+    bool turn_to(int rot);
+
+    bool turn_by(int rot);
 
     bool score();
 

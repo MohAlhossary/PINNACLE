@@ -16,5 +16,7 @@ void autonomous() {}
 void opcontrol() {
     while (true) {
         cortex.tick(controller);
+
+        pros::delay(20);
     }
 }
